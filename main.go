@@ -1,22 +1,27 @@
 package main
 
 import (
-	"log"
-
-	"github.com/EwbiDev/go-runescape/runescape"
+	"EwbiDev/osrs-price-tracker/pkg/client"
+	"fmt"
 )
 
+const userAgent = "test - discord@hybrid8513"
+
 func main() {
-	client := runescape.NewClient(nil)
+	geClient := client.NewClient(userAgent)
 
-	response, err := client.ListGrandExchangeItems("osrs", "a", 1, 1)
+	responseWiki, err := geClient.GetWikiPrices("24h")
 	if err != nil {
-		log.Fatal("Error:", err)
+		fmt.Println("Error:", err)
 	}
 
-	log.Println("Total items:", response.Total)
-	for _, item := range response.Items {
-		log.Println("Name:", item.Name)
-		log.Println("Description:", item.Description)
+	responseOfficial, err := geClient.GetOfficialPrices()
+	if err != nil {
+		fmt.Println("Error:", err)
 	}
+
+	fmt.Printf("%v\n", responseWiki.Data["2"])
+	fmt.Printf("%v\n", responseOfficial.Data["2"])
+	fmt.Printf("%v\n", responseOfficial.JagexTimestamp)
+	fmt.Printf("%v\n", responseOfficial.UpdateDetected)
 }
