@@ -12,8 +12,8 @@ erDiagram
         limit int
         members boolean
         value int
-        lowalch int
-        highalch int
+        low_alch int
+        high_alch int
 
         created_at datetime
         updated_at datetime
