@@ -35,7 +35,7 @@ func (ic *ItemController) Get(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("controllers:ItemController:Get - SelectItem " + string(err.Error())))
 		return
 	}
-	
+
 	itemJson, err := json.Marshal(item)
 	if err != nil {
 		w.WriteHeader(500)
