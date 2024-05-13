@@ -149,6 +149,112 @@ func (q *Queries) SelectItem(ctx context.Context, id int64) (Item, error) {
 	return i, err
 }
 
+const selectItems = `-- name: SelectItems :many
+SELECT
+    id, name, icon, trade_limit, members, item_value, low_alch, high_alch, created_at, updated_at
+FROM
+    Items
+WHERE
+    (
+        COALESCE(?1, 0) = 0
+        OR id = ?1
+    )
+    AND (
+        COALESCE(?2, 0) = 0
+        OR name LIKE CONCAT ("%", ?2, "%")
+    )
+    AND (
+        COALESCE(?3, 0) = 0
+        OR icon = ?3
+    )
+    AND (
+        COALESCE(?4, 0) = 0
+        OR trade_limit = ?4
+    )
+    AND (
+        COALESCE(?5, 0) = 0
+        OR members = ?5
+    )
+    AND (
+        COALESCE(?6, 0) = 0
+        OR item_value = ?6
+    )
+    AND (
+        COALESCE(?7, 0) = 0
+        OR low_alch = ?7
+    )
+    AND (
+        COALESCE(?8, 0) = 0
+        OR high_alch = ?8
+    )
+    AND (
+        COALESCE(?9, 0) = 0
+        OR created_at = ?9
+    )
+    AND (
+        COALESCE(?10, 0) = 0
+        OR updated_at = ?10
+    )
+`
+
+type SelectItemsParams struct {
+	ID         interface{} `json:"id"`
+	Name       interface{} `json:"name"`
+	Icon       interface{} `json:"icon"`
+	TradeLimit interface{} `json:"trade_limit"`
+	Members    interface{} `json:"members"`
+	ItemValue  interface{} `json:"item_value"`
+	LowAlch    interface{} `json:"low_alch"`
+	HighAlch   interface{} `json:"high_alch"`
+	CreatedAt  interface{} `json:"created_at"`
+	UpdatedAt  interface{} `json:"updated_at"`
+}
+
+func (q *Queries) SelectItems(ctx context.Context, arg SelectItemsParams) ([]Item, error) {
+	rows, err := q.db.QueryContext(ctx, selectItems,
+		arg.ID,
+		arg.Name,
+		arg.Icon,
+		arg.TradeLimit,
+		arg.Members,
+		arg.ItemValue,
+		arg.LowAlch,
+		arg.HighAlch,
+		arg.CreatedAt,
+		arg.UpdatedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Item
+	for rows.Next() {
+		var i Item
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Icon,
+			&i.TradeLimit,
+			&i.Members,
+			&i.ItemValue,
+			&i.LowAlch,
+			&i.HighAlch,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateItem = `-- name: UpdateItem :one
 UPDATE Items
 SET
