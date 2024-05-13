@@ -22,6 +22,12 @@ func NewItemController(db *db.Queries, ctx context.Context) *ItemController {
 func (ic *ItemController) Get(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
+	idStr := vars["id"]
+	if idStr == "" {
+		ic.list(w)
+		return
+	}
+
 	id, err := strconv.ParseInt(vars["id"], 10, 64)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -45,3 +51,22 @@ func (ic *ItemController) Get(w http.ResponseWriter, r *http.Request) {
 
 	w.Write(itemJson)
 }
+
+func (ic *ItemController) list(w http.ResponseWriter) {
+	items, err := ic.queries.ListItems(ic.ctx)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("controllers:ItemController:List - ListItems " + string(err.Error())))
+		return
+	}
+
+	itemJson, err := json.Marshal(items)
+	if err != nil {
+		w.WriteHeader(500)
+		w.Write([]byte("controllers:ItemController:List - json.Marshal " + string(err.Error())))
+		return
+	}
+
+	w.Write(itemJson)
+}
+
