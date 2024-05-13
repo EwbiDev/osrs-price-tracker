@@ -16,7 +16,7 @@ FROM
 ORDER BY
     name;
 
--- name: CountItems :many
+-- name: CountItems :one
 SELECT
     COUNT(*)
 FROM
