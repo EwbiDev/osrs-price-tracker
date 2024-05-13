@@ -39,7 +39,7 @@ func (q *Queries) CountItems(ctx context.Context) ([]int64, error) {
 	return items, nil
 }
 
-const createItem = `-- name: CreateItem :one
+const insertItem = `-- name: InsertItem :one
 INSERT INTO
     Items (
         id,
@@ -55,7 +55,7 @@ VALUES
     (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id, name, icon, trade_limit, members, item_value, low_alch, high_alch, created_at, updated_at
 `
 
-type CreateItemParams struct {
+type InsertItemParams struct {
 	ID         int64
 	Name       string
 	Icon       string
@@ -66,8 +66,8 @@ type CreateItemParams struct {
 	HighAlch   int64
 }
 
-func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) (Item, error) {
-	row := q.db.QueryRowContext(ctx, createItem,
+func (q *Queries) InsertItem(ctx context.Context, arg InsertItemParams) (Item, error) {
+	row := q.db.QueryRowContext(ctx, insertItem,
 		arg.ID,
 		arg.Name,
 		arg.Icon,
@@ -93,7 +93,7 @@ func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) (Item, e
 	return i, err
 }
 
-const getItemDetails = `-- name: GetItemDetails :one
+const selectItem = `-- name: SelectItem :one
 SELECT
     id, name, icon, trade_limit, members, item_value, low_alch, high_alch, created_at, updated_at
 FROM
@@ -104,8 +104,8 @@ LIMIT
     1
 `
 
-func (q *Queries) GetItemDetails(ctx context.Context, id int64) (Item, error) {
-	row := q.db.QueryRowContext(ctx, getItemDetails, id)
+func (q *Queries) SelectItem(ctx context.Context, id int64) (Item, error) {
+	row := q.db.QueryRowContext(ctx, selectItem, id)
 	var i Item
 	err := row.Scan(
 		&i.ID,
@@ -122,7 +122,7 @@ func (q *Queries) GetItemDetails(ctx context.Context, id int64) (Item, error) {
 	return i, err
 }
 
-const listItems = `-- name: ListItems :many
+const selectManyItems = `-- name: SelectManyItems :many
 SELECT
     id, name, icon, trade_limit, members, item_value, low_alch, high_alch, created_at, updated_at
 FROM
@@ -131,8 +131,8 @@ ORDER BY
     name
 `
 
-func (q *Queries) ListItems(ctx context.Context) ([]Item, error) {
-	rows, err := q.db.QueryContext(ctx, listItems)
+func (q *Queries) SelectManyItems(ctx context.Context) ([]Item, error) {
+	rows, err := q.db.QueryContext(ctx, selectManyItems)
 	if err != nil {
 		return nil, err
 	}

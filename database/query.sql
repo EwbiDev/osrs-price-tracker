@@ -1,4 +1,4 @@
--- name: GetItemDetails :one
+-- name: SelectItem :one
 SELECT
     *
 FROM
@@ -8,7 +8,7 @@ WHERE
 LIMIT
     1;
 
--- name: ListItems :many
+-- name: SelectManyItems :many
 SELECT
     *
 FROM
@@ -22,7 +22,7 @@ SELECT
 FROM
     Items;
 
--- name: CreateItem :one
+-- name: InsertItem :one
 INSERT INTO
     Items (
         id,
