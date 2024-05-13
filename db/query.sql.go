@@ -56,14 +56,14 @@ VALUES
 `
 
 type InsertItemParams struct {
-	ID         int64
-	Name       string
-	Icon       string
-	TradeLimit int64
-	Members    bool
-	ItemValue  int64
-	LowAlch    int64
-	HighAlch   int64
+	ID         int64  `json:"id"`
+	Name       string `json:"name"`
+	Icon       string `json:"icon"`
+	TradeLimit int64  `json:"trade_limit"`
+	Members    bool   `json:"members"`
+	ItemValue  int64  `json:"item_value"`
+	LowAlch    int64  `json:"low_alch"`
+	HighAlch   int64  `json:"high_alch"`
 }
 
 func (q *Queries) InsertItem(ctx context.Context, arg InsertItemParams) (Item, error) {
@@ -181,14 +181,14 @@ WHERE
 `
 
 type UpdateItemParams struct {
-	Name       string
-	Icon       string
-	TradeLimit int64
-	Members    bool
-	ItemValue  int64
-	LowAlch    int64
-	HighAlch   int64
-	ID         int64
+	Name       string `json:"name"`
+	Icon       string `json:"icon"`
+	TradeLimit int64  `json:"trade_limit"`
+	Members    bool   `json:"members"`
+	ItemValue  int64  `json:"item_value"`
+	LowAlch    int64  `json:"low_alch"`
+	HighAlch   int64  `json:"high_alch"`
+	ID         int64  `json:"id"`
 }
 
 func (q *Queries) UpdateItem(ctx context.Context, arg UpdateItemParams) (Item, error) {
