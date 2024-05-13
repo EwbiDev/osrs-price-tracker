@@ -9,6 +9,7 @@ import (
 
 	"EwbiDev/osrs-price-tracker/controllers"
 	"EwbiDev/osrs-price-tracker/db"
+	"EwbiDev/osrs-price-tracker/middleware"
 
 	"github.com/gorilla/mux"
 	_ "github.com/mattn/go-sqlite3"
@@ -23,9 +24,18 @@ func main() {
 	}
 	queries := db.New(dbInit)
 
+	router.Use(middleware.Logger)
+
 	ItemController := controllers.NewItemController(queries, ctx)
 
 	router.HandleFunc("/items/{id:[0-9]+}", ItemController.Get).Methods("GET")
+
+	router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		timeStart := time.Now()
+		http.Error(w, "404 Not Found", http.StatusNotFound)
+		timeElapsed := time.Since(timeStart)
+		log.Printf("%v 404 %v", r.URL.Path, timeElapsed)
+	})
 
 	http.Handle("/", router)
 
