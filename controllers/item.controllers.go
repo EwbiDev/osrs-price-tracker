@@ -23,15 +23,11 @@ func (ic *ItemController) Get(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	idStr := vars["id"]
-	if idStr == "" {
-		ic.list(w)
-		return
-	}
 
 	ic.getById(w, idStr)
 }
 
-func (ic *ItemController) list(w http.ResponseWriter) {
+func (ic *ItemController) List(w http.ResponseWriter, r *http.Request) {
 	items, err := ic.queries.ListItems(ic.ctx)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

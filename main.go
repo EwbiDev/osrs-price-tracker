@@ -30,6 +30,7 @@ func main() {
 	ItemController := controllers.NewItemController(queries, ctx)
 
 	router.HandleFunc("/items/{id:[0-9]+}", ItemController.Get).Methods("GET")
+	router.HandleFunc("/items", ItemController.List).Methods("GET")
 
 	router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		timeStart := time.Now()
