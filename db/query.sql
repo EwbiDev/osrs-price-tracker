@@ -8,7 +8,7 @@ WHERE
 LIMIT
     1;
 
--- name: SelectManyItems :many
+-- name: ListItems :many
 SELECT
     *
 FROM

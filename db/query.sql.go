@@ -93,36 +93,7 @@ func (q *Queries) InsertItem(ctx context.Context, arg InsertItemParams) (Item, e
 	return i, err
 }
 
-const selectItem = `-- name: SelectItem :one
-SELECT
-    id, name, icon, trade_limit, members, item_value, low_alch, high_alch, created_at, updated_at
-FROM
-    Items
-WHERE
-    id = ?
-LIMIT
-    1
-`
-
-func (q *Queries) SelectItem(ctx context.Context, id int64) (Item, error) {
-	row := q.db.QueryRowContext(ctx, selectItem, id)
-	var i Item
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.Icon,
-		&i.TradeLimit,
-		&i.Members,
-		&i.ItemValue,
-		&i.LowAlch,
-		&i.HighAlch,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
-}
-
-const selectManyItems = `-- name: SelectManyItems :many
+const listItems = `-- name: ListItems :many
 SELECT
     id, name, icon, trade_limit, members, item_value, low_alch, high_alch, created_at, updated_at
 FROM
@@ -131,8 +102,8 @@ ORDER BY
     name
 `
 
-func (q *Queries) SelectManyItems(ctx context.Context) ([]Item, error) {
-	rows, err := q.db.QueryContext(ctx, selectManyItems)
+func (q *Queries) ListItems(ctx context.Context) ([]Item, error) {
+	rows, err := q.db.QueryContext(ctx, listItems)
 	if err != nil {
 		return nil, err
 	}
@@ -163,6 +134,35 @@ func (q *Queries) SelectManyItems(ctx context.Context) ([]Item, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const selectItem = `-- name: SelectItem :one
+SELECT
+    id, name, icon, trade_limit, members, item_value, low_alch, high_alch, created_at, updated_at
+FROM
+    Items
+WHERE
+    id = ?
+LIMIT
+    1
+`
+
+func (q *Queries) SelectItem(ctx context.Context, id int64) (Item, error) {
+	row := q.db.QueryRowContext(ctx, selectItem, id)
+	var i Item
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Icon,
+		&i.TradeLimit,
+		&i.Members,
+		&i.ItemValue,
+		&i.LowAlch,
+		&i.HighAlch,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }
 
 const updateItem = `-- name: UpdateItem :one
