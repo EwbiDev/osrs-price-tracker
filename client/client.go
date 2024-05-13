@@ -10,7 +10,7 @@ import (
 type Client struct {
 	BaseURL   string
 	UserAgent string
-	Client    *http.Client
+	client    *http.Client
 }
 
 type WikiPrices struct {
@@ -55,7 +55,7 @@ type OfficialPrices struct {
 func NewClient(userAgent string) *Client {
 	return &Client{
 		UserAgent: userAgent,
-		Client:    &http.Client{},
+		client:    &http.Client{},
 	}
 }
 
@@ -67,7 +67,7 @@ func (c *Client) get(url string) ([]byte, error) {
 
 	req.Header.Set("User-Agent", c.UserAgent)
 
-	resp, err := c.Client.Do(req)
+	resp, err := c.client.Do(req)
 	if err != nil {
 		return nil, err
 	}
