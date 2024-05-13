@@ -1,27 +1,34 @@
 package main
 
 import (
-	"EwbiDev/osrs-price-tracker/pkg/client"
-	"fmt"
+	"context"
+	"database/sql"
+	_ "embed"
+	"log"
+	"net/http"
+
+	"EwbiDev/osrs-price-tracker/controllers"
+	"EwbiDev/osrs-price-tracker/db"
+
+	"github.com/gorilla/mux"
+	_ "github.com/mattn/go-sqlite3"
 )
 
-const userAgent = "test - discord@hybrid8513"
-
 func main() {
-	geClient := client.NewClient(userAgent)
-
-	responseWiki, err := geClient.GetWikiPrices("24h")
+	router := mux.NewRouter()
+	ctx := context.Background()
+	dbInit, err := sql.Open("sqlite3", "db/db.db")
 	if err != nil {
-		fmt.Println("Error:", err)
+		log.Fatalf("error opening database: %v", err)
 	}
+	queries := db.New(dbInit)
 
-	responseOfficial, err := geClient.GetOfficialPrices()
-	if err != nil {
-		fmt.Println("Error:", err)
-	}
+	ItemController := controllers.NewItemController(queries, ctx)
 
-	fmt.Printf("%v\n", responseWiki.Data["2"])
-	fmt.Printf("%v\n", responseOfficial.Data["2"])
-	fmt.Printf("%v\n", responseOfficial.JagexTimestamp)
-	fmt.Printf("%v\n", responseOfficial.UpdateDetected)
+	router.HandleFunc("/items/{id:[0-9]+}", ItemController.Get).Methods("GET")
+
+	http.Handle("/", router)
+
+	log.Printf("Starting server on http://localhost:4000")
+	http.ListenAndServe(":4000", router)
 }
