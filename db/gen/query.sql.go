@@ -3,7 +3,7 @@
 //   sqlc v1.26.0
 // source: query.sql
 
-package gen
+package db
 
 import (
 	"context"
@@ -174,7 +174,8 @@ SET
     members = ?,
     item_value = ?,
     low_alch = ?,
-    high_alch = ?
+    high_alch = ?,
+    updated_at = CURRENT_TIMESTAMP
 WHERE
     id = ? RETURNING id, name, icon, trade_limit, members, item_value, low_alch, high_alch, created_at, updated_at
 `

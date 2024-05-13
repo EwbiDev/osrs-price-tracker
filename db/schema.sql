@@ -37,33 +37,3 @@ CREATE TABLE
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
         FOREIGN KEY (item_id) REFERENCES Items (id)
     );
-
-CREATE TRIGGER IF NOT EXISTS update_item_timestamp BEFORE
-UPDATE ON Items FOR EACH ROW BEGIN
-UPDATE Items
-SET
-    updated_at = CURRENT_TIMESTAMP
-WHERE
-    id = OLD.id;
-
-END;
-
-CREATE TRIGGER IF NOT EXISTS update_official_price_timestamp BEFORE
-UPDATE ON Official_Prices FOR EACH ROW BEGIN
-UPDATE Official_Prices
-SET
-    updated_at = CURRENT_TIMESTAMP
-WHERE
-    id = OLD.id;
-
-END;
-
-CREATE TRIGGER IF NOT EXISTS update_wiki_price_timestamp BEFORE
-UPDATE ON Wiki_Prices FOR EACH ROW BEGIN
-UPDATE Wiki_Prices
-SET
-    updated_at = CURRENT_TIMESTAMP
-WHERE
-    id = OLD.id;
-
-END;

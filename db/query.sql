@@ -46,6 +46,7 @@ SET
     members = ?,
     item_value = ?,
     low_alch = ?,
-    high_alch = ?
+    high_alch = ?,
+    updated_at = CURRENT_TIMESTAMP
 WHERE
     id = ? RETURNING *;
