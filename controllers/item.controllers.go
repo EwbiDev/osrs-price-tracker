@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"net/url"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -47,7 +48,12 @@ func (ic *ItemController) Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ic *ItemController) List(w http.ResponseWriter, r *http.Request) {
-	items, err := ic.queries.ListItems(ic.ctx)
+	queries := r.URL.Query()
+
+	itemParams := populateItemParams(queries)
+
+	items, err := ic.queries.SelectItems(ic.ctx, itemParams)
+
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("controllers:ItemController:List - ListItems " + string(err.Error())))
@@ -62,4 +68,28 @@ func (ic *ItemController) List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write(itemJson)
+}
+
+func populateItemParams(queries url.Values) db.SelectItemsParams {
+	itemParams := db.SelectItemsParams{
+		ID:         getParam(queries, "id"),
+		Name:       getParam(queries, "name"),
+		Icon:       getParam(queries, "icon"),
+		TradeLimit: getParam(queries, "trade_limit"),
+		Members:    getParam(queries, "members"),
+		LowAlch:    getParam(queries, "low_alch"),
+		HighAlch:   getParam(queries, "high_alch"),
+		CreatedAt:  getParam(queries, "created_at"),
+		UpdatedAt:  getParam(queries, "updated_at"),
+	}
+
+	return itemParams
+}
+
+func getParam(queries url.Values, param string) *string {
+	if queries.Has(param) {
+		returnString := queries.Get(param)
+		return &returnString
+	}
+	return nil
 }
