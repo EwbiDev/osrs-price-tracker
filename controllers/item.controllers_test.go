@@ -57,6 +57,24 @@ func TestGETItem(t *testing.T) {
 		assertEqual(t, got.LowAlch, want.LowAlch)
 		assertEqual(t, got.HighAlch, want.HighAlch)
 	})
+
+	t.Run("returns bad request when invalid id given", func(t *testing.T) {
+		queries := setupTestDb(t)
+		ctx := context.Background()
+		controller := controllers.NewItemController(queries, ctx)
+
+		request, _ := http.NewRequest(http.MethodGet, "items/potato", nil)
+		response := httptest.NewRecorder()
+
+		vars := map[string]string{
+			"id": "potato",
+		}
+		request = mux.SetURLVars(request, vars)
+
+		controller.Get(response, request)
+
+		assertEqual(t, response.Code, http.StatusBadRequest)
+	})
 }
 
 func assertEqual(t *testing.T, got any, want any) {
