@@ -77,6 +77,7 @@ func populateItemParams(queries url.Values) db.SelectItemsParams {
 		Icon:       getParam(queries, "icon"),
 		TradeLimit: getParam(queries, "trade_limit"),
 		Members:    boolishToInt(queries, "members"),
+		ItemValue:  getParam(queries, "item_value"),
 		LowAlch:    getParam(queries, "low_alch"),
 		HighAlch:   getParam(queries, "high_alch"),
 		CreatedAt:  getParam(queries, "created_at"),
