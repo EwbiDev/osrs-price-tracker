@@ -17,17 +17,7 @@ import (
 
 func TestGETItem(t *testing.T) {
 	t.Run("returns item json", func(t *testing.T) {
-		dbInit, err := sql.Open("sqlite3", ":memory:")
-		if err != nil {
-			t.Errorf("error opening database: %v", err)
-		}
-		schema, err := os.ReadFile("../db/schema.sql")
-		if err != nil {
-			t.Errorf("failed to read schema.sql: %v", err)
-		}
-		dbInit.Exec(string(schema))
-		queries := db.New(dbInit)
-
+		queries := setupTestDb(t)
 		ctx := context.Background()
 		controller := controllers.NewItemController(queries, ctx)
 
@@ -57,7 +47,6 @@ func TestGETItem(t *testing.T) {
 		json.Unmarshal(response.Body.Bytes(), &got)
 		want := &newItem
 
-
 		assertEqual(t, response.Code, http.StatusOK)
 		assertEqual(t, got.ID, want.ID)
 		assertEqual(t, got.Name, want.Name)
@@ -74,4 +63,18 @@ func assertEqual(t *testing.T, got any, want any) {
 	if got != want {
 		t.Errorf("got %v, want %v", got, want)
 	}
+}
+
+func setupTestDb(t *testing.T) *db.Queries {
+	dbInit, err := sql.Open("sqlite3", ":memory:")
+	if err != nil {
+		t.Errorf("error opening database: %v", err)
+	}
+	schema, err := os.ReadFile("../db/schema.sql")
+	if err != nil {
+		t.Errorf("failed to read schema.sql: %v", err)
+	}
+	dbInit.Exec(string(schema))
+
+	return db.New(dbInit)
 }
