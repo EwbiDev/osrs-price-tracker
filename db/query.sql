@@ -31,7 +31,7 @@ WHERE
         OR trade_limit = sqlc.narg (trade_limit)
     )
     AND (
-        COALESCE(sqlc.narg (members), 0) = 0
+        COALESCE(sqlc.narg (members), -1) = -1
         OR members = sqlc.narg (members)
     )
     AND (

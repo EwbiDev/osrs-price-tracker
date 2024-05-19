@@ -76,7 +76,7 @@ func populateItemParams(queries url.Values) db.SelectItemsParams {
 		Name:       getParam(queries, "name"),
 		Icon:       getParam(queries, "icon"),
 		TradeLimit: getParam(queries, "trade_limit"),
-		Members:    getParam(queries, "members"),
+		Members:    boolishToInt(queries, "members"),
 		LowAlch:    getParam(queries, "low_alch"),
 		HighAlch:   getParam(queries, "high_alch"),
 		CreatedAt:  getParam(queries, "created_at"),
@@ -84,6 +84,22 @@ func populateItemParams(queries url.Values) db.SelectItemsParams {
 	}
 
 	return itemParams
+}
+
+func boolishToInt(queries url.Values, param string) *string {
+	query := queries.Get(param)
+
+	b, err := strconv.ParseBool(query)
+	if err != nil {
+		return nil
+	}
+
+	var returnVal = "0"
+	if b {
+		returnVal = "1"
+	}
+
+	return &returnVal
 }
 
 func getParam(queries url.Values, param string) *string {

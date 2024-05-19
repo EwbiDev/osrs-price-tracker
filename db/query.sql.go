@@ -172,7 +172,7 @@ WHERE
         OR trade_limit = ?4
     )
     AND (
-        COALESCE(?5, 0) = 0
+        COALESCE(?5, -1) = -1
         OR members = ?5
     )
     AND (
