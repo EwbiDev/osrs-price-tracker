@@ -75,6 +75,24 @@ func TestGETItem(t *testing.T) {
 
 		assertEqual(t, response.Code, http.StatusBadRequest)
 	})
+
+	t.Run("returns not found when id not found", func(t *testing.T) {
+		queries := setupTestDb(t)
+		ctx := context.Background()
+		controller := controllers.NewItemController(queries, ctx)
+
+		request, _ := http.NewRequest(http.MethodGet, "items/2", nil)
+		response := httptest.NewRecorder()
+
+		vars := map[string]string{
+			"id": "2",
+		}
+		request = mux.SetURLVars(request, vars)
+
+		controller.Get(response, request)
+
+		assertEqual(t, response.Code, http.StatusNotFound)
+	})
 }
 
 func assertEqual(t *testing.T, got any, want any) {
