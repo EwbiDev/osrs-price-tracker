@@ -7,18 +7,21 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/joho/godotenv"
 )
 
-func populateItems(ctx context.Context, geClient *client.Client, queries *Queries) error {
+func populateFromOfficial(ctx context.Context, geClient *client.Client, queries *Queries) error {
 	responseOfficial, err := geClient.GetOfficialPrices()
 	if err != nil {
 		return err
 	}
 
+	jagexTimestamp := time.Unix(int64(responseOfficial.JagexTimestamp), 0)
+
 	for _, v := range responseOfficial.Data {
-		insertData := InsertItemParams{
+		itemData := InsertItemParams{
 			ID:         int64(v.ID),
 			Name:       v.Name,
 			Icon:       v.Icon,
@@ -29,7 +32,20 @@ func populateItems(ctx context.Context, geClient *client.Client, queries *Querie
 			HighAlch:   int64(v.HighAlch),
 		}
 
-		_, err = queries.InsertItem(ctx, insertData)
+		_, err = queries.InsertItem(ctx, itemData)
+		if err != nil {
+			return err
+		}
+
+		priceData := InsertOfficialPriceParams{
+			ItemID:         int64(v.ID),
+			Price:          int64(v.Price),
+			LastPrice:      int64(v.Last),
+			Volume:         int64(v.Volume),
+			JagexTimestamp: jagexTimestamp,
+		}
+
+		_, err = queries.InsertOfficialPrice(ctx, priceData)
 		if err != nil {
 			return err
 		}
@@ -45,9 +61,9 @@ func populateItems(ctx context.Context, geClient *client.Client, queries *Querie
 }
 
 func Seed() {
-	err := godotenv.Load("../.env")
+	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Fatalf("Error loading .env file: %v", err)
 	}
 	userAgent := os.Getenv("USER_AGENT")
 	geClient := client.NewClient(userAgent)
@@ -61,6 +77,9 @@ func Seed() {
 		log.Fatalf("error opening database: %v", err)
 	}
 	queries := New(dbInit)
-
-	populateItems(ctx, geClient, queries)
+	
+	err = populateFromOfficial(ctx, geClient, queries)
+	if err != nil {
+		log.Fatalf("error seeding: %v", err)
+	}
 }
