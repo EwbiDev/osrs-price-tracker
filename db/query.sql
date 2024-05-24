@@ -97,3 +97,15 @@ SET
     updated_at = CURRENT_TIMESTAMP
 WHERE
     id = ? RETURNING *;
+
+-- name: InsertOfficialPrice :one
+INSERT INTO
+    Official_Prices (
+        item_id,
+        price,
+        last_price,
+        volume,
+        jagex_timestamp
+    )
+VALUES
+    (?, ?, ?, ?, ?) RETURNING *;

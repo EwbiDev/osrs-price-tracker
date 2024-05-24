@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"time"
 )
 
 const countItems = `-- name: CountItems :one
@@ -71,6 +72,49 @@ func (q *Queries) InsertItem(ctx context.Context, arg InsertItemParams) (Item, e
 		&i.ItemValue,
 		&i.LowAlch,
 		&i.HighAlch,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const insertOfficialPrice = `-- name: InsertOfficialPrice :one
+INSERT INTO
+    Official_Prices (
+        item_id,
+        price,
+        last_price,
+        volume,
+        jagex_timestamp
+    )
+VALUES
+    (?, ?, ?, ?, ?) RETURNING id, item_id, price, last_price, volume, jagex_timestamp, created_at, updated_at
+`
+
+type InsertOfficialPriceParams struct {
+	ItemID         int64     `json:"item_id"`
+	Price          int64     `json:"price"`
+	LastPrice      int64     `json:"last_price"`
+	Volume         int64     `json:"volume"`
+	JagexTimestamp time.Time `json:"jagex_timestamp"`
+}
+
+func (q *Queries) InsertOfficialPrice(ctx context.Context, arg InsertOfficialPriceParams) (OfficialPrice, error) {
+	row := q.db.QueryRowContext(ctx, insertOfficialPrice,
+		arg.ItemID,
+		arg.Price,
+		arg.LastPrice,
+		arg.Volume,
+		arg.JagexTimestamp,
+	)
+	var i OfficialPrice
+	err := row.Scan(
+		&i.ID,
+		&i.ItemID,
+		&i.Price,
+		&i.LastPrice,
+		&i.Volume,
+		&i.JagexTimestamp,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
