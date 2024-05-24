@@ -22,13 +22,14 @@ type Item struct {
 }
 
 type OfficialPrice struct {
-	ID        int64     `json:"id"`
-	ItemID    int64     `json:"item_id"`
-	Price     int64     `json:"price"`
-	LastPrice int64     `json:"last_price"`
-	Volume    int64     `json:"volume"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID             int64     `json:"id"`
+	ItemID         int64     `json:"item_id"`
+	Price          int64     `json:"price"`
+	LastPrice      int64     `json:"last_price"`
+	Volume         int64     `json:"volume"`
+	JagexTimestamp time.Time `json:"jagex_timestamp"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
 }
 
 type WikiPrice struct {

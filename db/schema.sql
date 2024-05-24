@@ -19,6 +19,7 @@ CREATE TABLE
         price INTEGER NOT NULL,
         last_price INTEGER NOT NULL,
         volume INTEGER NOT NULL,
+        jagex_timestamp TIMESTAMP NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
         FOREIGN KEY (item_id) REFERENCES Items (id)
