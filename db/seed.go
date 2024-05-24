@@ -33,14 +33,14 @@ func populateItems(ctx context.Context, geClient *client.Client, queries *Querie
 		if err != nil {
 			return err
 		}
-
-		getCount, err := queries.CountItems(ctx)
-		if err != nil {
-			return err
-		}
-
-		fmt.Printf("Generated %v items", getCount)
 	}
+
+	getCount, err := queries.CountItems(ctx)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Generated %v items", getCount)
 	return nil
 }
 
