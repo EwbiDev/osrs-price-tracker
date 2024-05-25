@@ -34,6 +34,7 @@ func main() {
 	router.HandleFunc("/items", ItemController.List).Methods("GET")
 
 	router.HandleFunc("/official_prices/{id:[0-9]+}", OfficialPriceController.GetByItemId).Methods("GET")
+	router.HandleFunc("/official_prices", OfficialPriceController.ListLatestPrices).Methods("GET")
 
 	router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		timeStart := time.Now()

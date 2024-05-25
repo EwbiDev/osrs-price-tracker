@@ -53,3 +53,30 @@ func (opc *OfficialPriceController) GetByItemId(w http.ResponseWriter, r *http.R
 
 	w.Write(responseJson)
 }
+
+func (opc OfficialPriceController) ListLatestPrices(w http.ResponseWriter, r *http.Request) {
+	prices, err := opc.queries.SelectLatestOfficialPrices(opc.ctx)
+	if err != nil {
+		http.Error(w, "OfficialPriceController.GetLatestPrices - Select: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if prices == nil {
+		prices = []db.OfficialPrice{}
+	}
+
+	response := struct {
+		Status string             `json:"status"`
+		Prices []db.OfficialPrice `json:"prices"`
+	}{
+		Status: "success",
+		Prices: prices,
+	}
+
+	responseJson, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, "OfficialPriceController.Get - json.Marshal: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Write(responseJson)
+}
