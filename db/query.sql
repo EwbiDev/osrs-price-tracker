@@ -98,6 +98,14 @@ SET
 WHERE
     id = ? RETURNING *;
 
+-- name: SelectOfficialPricesByItem :many
+SELECT
+    *
+FROM
+    Official_Prices
+WHERE
+    item_id = ?;
+
 -- name: InsertOfficialPrice :one
 INSERT INTO
     Official_Prices (

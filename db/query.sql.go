@@ -299,6 +299,47 @@ func (q *Queries) SelectItems(ctx context.Context, arg SelectItemsParams) ([]Ite
 	return items, nil
 }
 
+const selectOfficialPricesByItem = `-- name: SelectOfficialPricesByItem :many
+SELECT
+    id, item_id, price, last_price, volume, jagex_timestamp, created_at, updated_at
+FROM
+    Official_Prices
+WHERE
+    item_id = ?
+`
+
+func (q *Queries) SelectOfficialPricesByItem(ctx context.Context, itemID int64) ([]OfficialPrice, error) {
+	rows, err := q.db.QueryContext(ctx, selectOfficialPricesByItem, itemID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []OfficialPrice
+	for rows.Next() {
+		var i OfficialPrice
+		if err := rows.Scan(
+			&i.ID,
+			&i.ItemID,
+			&i.Price,
+			&i.LastPrice,
+			&i.Volume,
+			&i.JagexTimestamp,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateItem = `-- name: UpdateItem :one
 UPDATE Items
 SET
