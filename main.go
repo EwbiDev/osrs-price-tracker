@@ -28,9 +28,12 @@ func main() {
 	router.Use(middleware.Logger)
 
 	ItemController := controllers.NewItemController(queries, ctx)
+	OfficialPriceController := controllers.NewOfficialPriceController(queries, ctx)
 
 	router.HandleFunc("/items/{id:[0-9]+}", ItemController.Get).Methods("GET")
 	router.HandleFunc("/items", ItemController.List).Methods("GET")
+
+	router.HandleFunc("/official_prices/{id:[0-9]+}", OfficialPriceController.GetByItemId).Methods("GET")
 
 	router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		timeStart := time.Now()
