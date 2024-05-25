@@ -106,6 +106,24 @@ FROM
 WHERE
     item_id = ?;
 
+-- name: SelectLatestOfficialPrices :many
+SELECT
+    OP1.*
+FROM
+    Official_Prices OP1
+    JOIN (
+        SELECT
+            item_id,
+            MAX(jagex_timestamp) AS latest_timestamp
+        FROM
+            Official_Prices
+        GROUP BY
+            item_id
+    ) OP2 ON OP1.item_id = OP2.item_id
+    AND OP1.jagex_timestamp = OP2.latest_timestamp
+ORDER BY
+    OP1.item_id;
+
 -- name: InsertOfficialPrice :one
 INSERT INTO
     Official_Prices (

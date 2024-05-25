@@ -299,6 +299,57 @@ func (q *Queries) SelectItems(ctx context.Context, arg SelectItemsParams) ([]Ite
 	return items, nil
 }
 
+const selectLatestOfficialPrices = `-- name: SelectLatestOfficialPrices :many
+SELECT
+    op1.id, op1.item_id, op1.price, op1.last_price, op1.volume, op1.jagex_timestamp, op1.created_at, op1.updated_at
+FROM
+    Official_Prices OP1
+    JOIN (
+        SELECT
+            item_id,
+            MAX(jagex_timestamp) AS latest_timestamp
+        FROM
+            Official_Prices
+        GROUP BY
+            item_id
+    ) OP2 ON OP1.item_id = OP2.item_id
+    AND OP1.jagex_timestamp = OP2.latest_timestamp
+ORDER BY
+    OP1.item_id
+`
+
+func (q *Queries) SelectLatestOfficialPrices(ctx context.Context) ([]OfficialPrice, error) {
+	rows, err := q.db.QueryContext(ctx, selectLatestOfficialPrices)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []OfficialPrice
+	for rows.Next() {
+		var i OfficialPrice
+		if err := rows.Scan(
+			&i.ID,
+			&i.ItemID,
+			&i.Price,
+			&i.LastPrice,
+			&i.Volume,
+			&i.JagexTimestamp,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const selectOfficialPricesByItem = `-- name: SelectOfficialPricesByItem :many
 SELECT
     id, item_id, price, last_price, volume, jagex_timestamp, created_at, updated_at
