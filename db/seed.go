@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"time"
 
 	"github.com/joho/godotenv"
 )
@@ -17,8 +16,6 @@ func populateFromOfficial(ctx context.Context, geClient *client.Client, queries 
 	if err != nil {
 		return err
 	}
-
-	jagexTimestamp := time.Unix(int64(responseOfficial.JagexTimestamp), 0)
 
 	for _, v := range responseOfficial.Data {
 		itemData := InsertItemParams{
@@ -42,7 +39,7 @@ func populateFromOfficial(ctx context.Context, geClient *client.Client, queries 
 			Price:          int64(v.Price),
 			LastPrice:      int64(v.Last),
 			Volume:         int64(v.Volume),
-			JagexTimestamp: jagexTimestamp,
+			JagexTimestamp: responseOfficial.JagexTimestamp,
 		}
 
 		_, err = queries.InsertOfficialPrice(ctx, priceData)

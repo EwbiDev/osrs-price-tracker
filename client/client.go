@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"time"
 )
 
 type Client struct {
@@ -47,8 +48,8 @@ type intermediateOfficialPrices struct {
 }
 
 type OfficialPrices struct {
-	UpdateDetected int
-	JagexTimestamp int
+	UpdateDetected time.Time
+	JagexTimestamp time.Time
 	Data           map[string]OfficialItem
 }
 
@@ -139,13 +140,13 @@ func (c *Client) GetOfficialPrices() (*OfficialPrices, error) {
 	if !ok1 {
 		return nil, errors.New("unable to assert UpdateDetected into float64")
 	}
-	prices.UpdateDetected = int(v1)
+	prices.UpdateDetected = time.Unix(int64(v1), 0).UTC()
 
 	v2, ok2 := jagexTimestamp.(float64)
 	if !ok2 {
 		return nil, errors.New("unable to assert JagexTimeStamp into int")
 	}
-	prices.JagexTimestamp = int(v2)
+	prices.JagexTimestamp = time.Unix(int64(v2), 0).UTC()
 
 	return &prices, nil
 }
