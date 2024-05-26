@@ -15,6 +15,12 @@ type Client struct {
 }
 
 type WikiPrices struct {
+	Data      map[string]WikiItem
+	Timestamp time.Time
+	Period    string
+}
+
+type intermediateWikiPrices struct {
 	Data      map[string]WikiItem `json:"data"`
 	Timestamp int                 `json:"timestamp"`
 }
@@ -92,13 +98,19 @@ func (c *Client) GetWikiPrices(period string) (*WikiPrices, error) {
 		return nil, err
 	}
 
-	var response WikiPrices
-	err = json.Unmarshal(body, &response)
+	var interPrices intermediateWikiPrices
+	err = json.Unmarshal(body, &interPrices)
 	if err != nil {
 		return nil, err
 	}
 
-	return &response, nil
+	prices := WikiPrices{
+		Data:      interPrices.Data,
+		Timestamp: time.Unix(int64(interPrices.Timestamp), 0).UTC(),
+		Period:    period,
+	}
+
+	return &prices, nil
 }
 
 func (c *Client) GetOfficialPrices() (*OfficialPrices, error) {
