@@ -124,43 +124,34 @@ func (q *Queries) InsertOfficialPrice(ctx context.Context, arg InsertOfficialPri
 const insertWikiPrice = `-- name: InsertWikiPrice :one
 INSERT INTO
     Wiki_Prices (
-        id,
         item_id,
         avg_high_price,
         high_price_volume,
         avg_low_price,
         low_price_volume,
-        timescale,
-        created_at,
-        updated_at
+        timescale
     )
 VALUES
-    (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id, item_id, avg_high_price, high_price_volume, avg_low_price, low_price_volume, timescale, created_at, updated_at
+    (?, ?, ?, ?, ?, ?) RETURNING id, item_id, avg_high_price, high_price_volume, avg_low_price, low_price_volume, timescale, created_at, updated_at
 `
 
 type InsertWikiPriceParams struct {
-	ID              int64     `json:"id"`
-	ItemID          int64     `json:"item_id"`
-	AvgHighPrice    int64     `json:"avg_high_price"`
-	HighPriceVolume int64     `json:"high_price_volume"`
-	AvgLowPrice     int64     `json:"avg_low_price"`
-	LowPriceVolume  int64     `json:"low_price_volume"`
-	Timescale       string    `json:"timescale"`
-	CreatedAt       time.Time `json:"created_at"`
-	UpdatedAt       time.Time `json:"updated_at"`
+	ItemID          int64  `json:"item_id"`
+	AvgHighPrice    int64  `json:"avg_high_price"`
+	HighPriceVolume int64  `json:"high_price_volume"`
+	AvgLowPrice     int64  `json:"avg_low_price"`
+	LowPriceVolume  int64  `json:"low_price_volume"`
+	Timescale       string `json:"timescale"`
 }
 
 func (q *Queries) InsertWikiPrice(ctx context.Context, arg InsertWikiPriceParams) (WikiPrice, error) {
 	row := q.db.QueryRowContext(ctx, insertWikiPrice,
-		arg.ID,
 		arg.ItemID,
 		arg.AvgHighPrice,
 		arg.HighPriceVolume,
 		arg.AvgLowPrice,
 		arg.LowPriceVolume,
 		arg.Timescale,
-		arg.CreatedAt,
-		arg.UpdatedAt,
 	)
 	var i WikiPrice
 	err := row.Scan(

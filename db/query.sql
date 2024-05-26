@@ -139,15 +139,12 @@ VALUES
 -- name: InsertWikiPrice :one
 INSERT INTO
     Wiki_Prices (
-        id,
         item_id,
         avg_high_price,
         high_price_volume,
         avg_low_price,
         low_price_volume,
-        timescale,
-        created_at,
-        updated_at
+        timescale
     )
 VALUES
-    (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING *;
+    (?, ?, ?, ?, ?, ?) RETURNING *;
