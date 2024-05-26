@@ -16,7 +16,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func main() {
+func server() {
 	router := mux.NewRouter()
 	ctx := context.Background()
 	dbInit, err := sql.Open("sqlite3", "db/db.db")
@@ -47,4 +47,8 @@ func main() {
 
 	log.Printf("Starting server on http://localhost:4000")
 	http.ListenAndServe(":4000", router)
+}
+
+func main() {
+	server()
 }
