@@ -4,7 +4,6 @@ import (
 	"EwbiDev/osrs-price-tracker/client"
 	"context"
 	"database/sql"
-	"fmt"
 	"log"
 	"os"
 
@@ -53,7 +52,7 @@ func populateFromOfficial(ctx context.Context, geClient *client.Client, queries 
 		return err
 	}
 
-	fmt.Printf("Generated %v items", getCount)
+	log.Printf("Generated %v items", getCount)
 	return nil
 }
 
