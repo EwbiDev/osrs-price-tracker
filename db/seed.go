@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
 )
@@ -56,6 +57,36 @@ func populateFromOfficial(ctx context.Context, geClient *client.Client, queries 
 	return nil
 }
 
+func populateFromWiki(ctx context.Context, geClient *client.Client, queries *Queries) error {
+	responseWiki, err := geClient.GetWikiPrices("24h")
+	if err != nil {
+		return err
+	}
+
+	for i, v := range responseWiki.Data {
+		itemId, err := strconv.ParseInt(i, 10, 64)
+		if err != nil {
+			return err
+		}
+
+		wikiData := InsertWikiPriceParams{
+			ItemID:          itemId,
+			AvgHighPrice:    int64(v.AvgHighPrice),
+			HighPriceVolume: int64(v.HighPriceVolume),
+			AvgLowPrice:     int64(v.AvgLowPrice),
+			LowPriceVolume:  int64(v.LowPriceVolume),
+			Timescale:       responseWiki.Period,
+		}
+
+		_, err = queries.InsertWikiPrice(ctx, wikiData)
+		if err != nil {
+			return nil
+		}
+	}
+
+	return nil
+}
+
 func Seed() {
 	err := godotenv.Load()
 	if err != nil {
@@ -73,9 +104,14 @@ func Seed() {
 		log.Fatalf("error opening database: %v", err)
 	}
 	queries := New(dbInit)
-	
+
 	err = populateFromOfficial(ctx, geClient, queries)
 	if err != nil {
-		log.Fatalf("error seeding: %v", err)
+		log.Fatalf("error seeding official data: %v", err)
+	}
+
+	err = populateFromWiki(ctx, geClient, queries)
+	if err != nil {
+		log.Fatalf("error seeding wiki data: %v", err)
 	}
 }
